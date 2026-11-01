@@ -1,6 +1,6 @@
 import "./style.css";
 import * as THREE from "three";
-import init, { dent } from "bonbondrop";
+import init, { dent, Spring } from "bonbondrop";
 
 async function main(): Promise<void> {
   await init();
@@ -61,38 +61,58 @@ async function main(): Promise<void> {
   const pointer = new THREE.Vector2();
   const vertex = new THREE.Vector3();
 
+  const spring = new Spring();
+  let pressed = false;
+  let touchCenter: THREE.Vector3 | null = null;
+  let previousFrame = performance.now();
+
   renderer.domElement.addEventListener("pointerdown", (event: PointerEvent) => {
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObject(sticker)[0];
     if (!hit) return;
 
-    const center = sticker.worldToLocal(hit.point.clone());
+    touchCenter = sticker.worldToLocal(hit.point.clone());
+    pressed = true;
+    renderer.domElement.setPointerCapture(event.pointerId);
+  });
 
-    // Always deform from the original surface rather than stacking dents.
-    for (let i = 0; i < positions.count; i++) {
-      vertex.fromArray(original, i * 3);
-      const offset = dent(vertex.distanceTo(center));
-      positions.setY(i, vertex.y + offset);
+  const release = () => {
+    pressed = false;
+  };
+  renderer.domElement.addEventListener("pointerup", release);
+  renderer.domElement.addEventListener("pointercancel", release);
+  renderer.domElement.addEventListener("lostpointercapture", release);
+
+  function animate(now: number) {
+    const dt = Math.min((now - previousFrame) / 1000, 1 / 30);
+    previousFrame = now;
+
+    // Rust integrates the spring's position and velocity each frame.
+    const compression = spring.step(dt, pressed ? 1 : 0);
+    if (touchCenter !== null) {
+      for (let i = 0; i < positions.count; i++) {
+        vertex.fromArray(original, i * 3);
+        const offset = dent(vertex.distanceTo(touchCenter)) * compression;
+        positions.setY(i, vertex.y + offset);
+      }
+      positions.needsUpdate = true;
+      geometry.computeVertexNormals();
+      geometry.computeBoundingSphere();
     }
 
-    positions.needsUpdate = true;
-    geometry.computeVertexNormals();
-    geometry.computeBoundingSphere();
     renderer.render(scene, camera);
-  });
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.render(scene, camera);
   });
-
-  renderer.render(scene, camera);
 }
 
 main().catch(console.error);
