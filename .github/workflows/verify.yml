@@ -1,9 +1,20 @@
-name: Verify
+name: Build and deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - feat/spring-back-animation
   pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -18,11 +29,30 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Install wasm-pack
         run: cargo install wasm-pack --locked
-      - name: Rust tests
+      - name: Test Rust
         run: cargo test --manifest-path bonbondrop/Cargo.toml
-      - name: Build Wasm
+      - name: Compile Wasm
         run: wasm-pack build bonbondrop --target web
-      - name: Install frontend dependencies
+      - name: Install web dependencies
         run: npm install --prefix web
-      - name: Build frontend
+      - name: Build website
         run: npm run build --prefix web
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
