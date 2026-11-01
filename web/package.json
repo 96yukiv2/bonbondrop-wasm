@@ -1,0 +1,20 @@
+{
+  "name": "bonbondrop-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bonbondrop": "file:../bonbondrop/pkg",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0"
+  }
+}
