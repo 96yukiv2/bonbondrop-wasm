@@ -69,3 +69,23 @@ mod tests {
         assert!(spring.position().abs() < 0.01);
     }
 }
+
+/// Height of a partially lifted sticker. `along` is the vertex position along
+/// the direction of the peel (-1 to 1); progress runs from attached to lifted.
+#[wasm_bindgen]
+pub fn peel_height(along: f32, progress: f32) -> f32 {
+    let progress = progress.clamp(0.0, 1.0);
+    let edge = ((along + 1.0) * 0.5).clamp(0.0, 1.0);
+    progress * (0.18 + 0.42 * edge)
+}
+
+#[cfg(test)]
+mod peel_tests {
+    use super::peel_height;
+    #[test]
+    fn peel_lifts_the_grabbed_side_and_clamps_progress() {
+        assert_eq!(peel_height(1.0, 0.0), 0.0);
+        assert!(peel_height(1.0, 1.0) > peel_height(-1.0, 1.0));
+        assert_eq!(peel_height(1.0, 2.0), peel_height(1.0, 1.0));
+    }
+}
