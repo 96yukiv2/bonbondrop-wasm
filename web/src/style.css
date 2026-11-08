@@ -1,16 +1,19 @@
-html,
-body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-#app {
-  width: 100%;
-  height: 100%;
-}
-
-canvas {
-  display: block;
-}
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap');
+:root { font-family: 'Zen Maru Gothic', sans-serif; color: #435c70; background: #f1faff; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 300px; background: radial-gradient(circle at 12% 12%, #fff 0 4px, transparent 5px), radial-gradient(circle at 88% 30%, #fff 0 5px, transparent 6px), #f1faff; }
+.layout { width: min(100% - 32px, 900px); margin: 0 auto; padding: 38px 0 24px; text-align: center; }
+.eyebrow { font-size: 10px; font-weight: 900; letter-spacing: .25em; color: #90b9ce; }
+h1 { margin: 9px 0 4px; font-size: clamp(25px, 4vw, 36px); letter-spacing: .06em; color: #557993; }
+header p { margin: 0 0 24px; font-size: 13px; color: #8aa9bb; }
+.stage { position: relative; padding: 20px; border: 1px solid #dceef7; border-radius: 28px; background: rgba(255,255,255,.82); box-shadow: 0 16px 50px #a9cbd32b; }
+.stage-label { display: flex; justify-content: space-between; padding: 0 4px 12px; font-size: 10px; font-weight: 900; letter-spacing: .16em; color: #97bdce; }
+.stage-label span { color: #c3d9e3; }
+#canvas { height: min(52vh, 430px); min-height: 290px; overflow: hidden; border: 1px solid #e4f0ee; border-radius: 14px; background-color: #fcfdf4; background-image: linear-gradient(45deg, #e8f7fa 25%, transparent 25%), linear-gradient(-45deg, #e8f7fa 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e8f7fa 75%), linear-gradient(-45deg, transparent 75%, #e8f7fa 75%); background-size: 80px 80px; background-position: 0 0, 0 40px, 40px -40px, -40px 0; }
+canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+canvas.active { cursor: grabbing; }
+.hint { padding: 16px 0 0; font-size: 12px; font-weight: 700; color: #8aa9bb; }
+.hint span { font-size: 16px; }.hint i { display: inline-block; width: 4px; height: 4px; margin: 0 12px 3px; border-radius: 50%; background: #c4dce7; }
+footer { padding-top: 22px; } button { border: 1px solid #cde6f1; border-radius: 999px; background: #fff; color: #7aa4ba; padding: 11px 21px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; } button:hover { background: #e8f7fd; } button:focus-visible { outline: 3px solid #74bce4; outline-offset: 3px; }
+footer p { color: #abc2cc; font-size: 10px; margin: 18px 0 0; } .error { padding: 3rem; text-align: center; }
+@media(max-width: 540px) { .layout { padding-top: 28px; } .stage { padding: 14px; border-radius: 20px; } #canvas { height: 47vh; } .hint { font-size: 10px; } .hint i { margin: 0 5px 3px; } }
